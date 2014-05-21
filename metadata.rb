@@ -1,3 +1,4 @@
+name             "gengine"
 maintainer       "Victor Penso"
 maintainer_email "vic.penso@gmail.com"
 license          "Apache 2.0"
