@@ -33,12 +33,16 @@ if node.gengine.clients.has_key? 'search'
 end
 
 # make sure that duplicates from all configuration sources get removed
-node.gengine.clients.nodes.uniq!
+ngcn = Array.new
+node.gengine.clients.nodes.each do |name|
+  ngcn << name
+end
+ngcn.uniq!
 
 # list of already know clients from the master
 clients = Gengine::Config::list 'qconf -ss'
 
-node.gengine.clients.nodes.each do |name|
+ngcn.each do |name|
   unless clients.include? name
     execute "qconf -as #{name}"
     execute "qconf -ah #{name}" if node.gengine.clients.admins
