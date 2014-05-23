@@ -20,7 +20,10 @@
 case  node.platform
 when 'debian','ubuntu'
   package 'git-core'
-  package 'gridengine-master'
+  gm = package 'gridengine-master' do
+    action :nothing
+  end
+  gm.run_action(:install)
   service 'gridengine-master' do
     supports :restart => true, :'force-reload' => true
   end

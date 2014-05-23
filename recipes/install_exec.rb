@@ -22,7 +22,10 @@ include_recipe 'gengine::install_client'
 
 case  node.platform
 when 'debian','ubuntu'
-  package 'gridengine-exec'
+  p = package 'gridengine-exec' do
+    action :nothing
+  end
+  p.run_action(:install)
   service 'gridengine-exec' do
     pattern "sge_execd"
     stop_command "killall sge_execd"

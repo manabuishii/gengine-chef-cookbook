@@ -19,7 +19,10 @@
 
 case  node.platform
 when 'debian','ubuntu'
-  package 'gridengine-client'
+  p = package 'gridengine-client' do
+    action :nothing
+  end
+  p.run_action(:install)
 end
 
 # make sure to communicate with the correct master
