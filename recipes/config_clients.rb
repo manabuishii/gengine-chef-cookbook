@@ -44,8 +44,24 @@ clients = Gengine::Config::list 'qconf -ss'
 
 ngcn.each do |name|
   unless clients.include? name
-    execute "qconf -as #{name}"
-    execute "qconf -ah #{name}" if node.gengine.clients.admins
+    case node.platform
+    when 'debian','ubuntu'
+      execute "qconf -as #{name}"
+      execute "qconf -ah #{name}" if node.gengine.clients.admins
+    when 'centos'
+      execute "qconf -as #{name}" do
+        command  "qconf -as #{name}"
+        action :run
+        environment ({"SGE_ROOT" => "/usr/share/gridengine"})
+      end
+      execute "qconf -ah #{name}" do
+        command  "qconf -ah #{name}"
+        action :run
+        environment ({"SGE_ROOT" => "/usr/share/gridengine"})
+        only_if { node.gengine.clients.admins }
+      end
+    end
+
     Chef::Log.info("[gengine::config_clients] Node '#{name}' becomes a submit node.")
   end
   clients.delete name

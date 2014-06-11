@@ -52,9 +52,18 @@ end
 config_file = "#{node.gengine.config}/quotas"
 
 _command = "qconf -Mrqs #{config_file}"
-execute _command do
-  command _command
-  action :nothing
+case node.platform
+when 'debian','ubuntu'
+  execute _command do
+    command _command
+    action :nothing
+  end
+when 'centos'
+  execute _command do
+    command _command
+    action :nothing
+    environment ({"SGE_ROOT" => "/usr/share/gridengine"})
+  end
 end
 
 quotas = String.new

@@ -20,13 +20,24 @@
 case  node.platform
 when 'debian','ubuntu'
   package 'git-core'
-  gm = package 'gridengine-master' do
-    action :nothing
-  end
-  gm.run_action(:install)
+  package 'gridengine-master'
   service 'gridengine-master' do
     supports :restart => true, :'force-reload' => true
   end
+when 'centos'
+  package 'git'
+  package 'gridengine'
+  package 'gridengine-execd'
+  package 'gridengine-qmaster'
+  execute "inst_sge" do
+    command <<-EOC
+      cd /usr/share/gridengine
+      ./inst_sge -m -auto ./my_configuration.conf
+    EOC
+  end
+  #service 'gridengine-master' do
+  #  supports :restart => true, :'force-reload' => true
+  #end
 end
 
 # tell recipe "install_client" that the master is local
@@ -36,8 +47,10 @@ include_recipe "gengine::install_client"
 node.default[:gengine][:clients][:nodes] << node.fqdn
 # queue master configuration from an external Git repository
 include_recipe 'gengine::config_repository' unless node.gengine.repo.url.empty?
+case  node.platform
+when 'debian','ubuntu'
 # Several runs will be needed to configuration the master!
-if ::File.exists? node.gengine.config
+#if ::File.exists? node.gengine.config
   # the correct order is important here!
   include_recipe 'gengine::config_global'
   include_recipe 'gengine::config_complex_values'
@@ -51,7 +64,21 @@ if ::File.exists? node.gengine.config
   include_recipe 'gengine::config_host_groups'
   include_recipe 'gengine::config_queues'
   include_recipe 'gengine::config_clients'
-else
-  log("Configuration of GridEngine queue master not finished yet!") { level :warn }
-end
+#else
+#  log("Configuration of GridEngine queue master not finished yet!") { level :warn }
+#end
 
+when 'centos'
+  include_recipe 'gengine::config_global'
+  include_recipe 'gengine::config_complex_values'
+  include_recipe 'gengine::config_scheduler'
+  include_recipe 'gengine::config_groups'
+  include_recipe 'gengine::config_projects'
+  include_recipe 'gengine::config_users'
+  include_recipe 'gengine::config_sharetree'
+  include_recipe 'gengine::config_parallel_environments'
+  include_recipe 'gengine::config_quotas'
+  include_recipe 'gengine::config_host_groups'
+  include_recipe 'gengine::config_queues'
+  include_recipe 'gengine::config_clients'
+end

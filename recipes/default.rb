@@ -18,11 +18,20 @@
 #
 
 case node.platform
-when 'debian','ubuntu'
+when 'debian','ubuntu','centos'
   # defaults are set with cookbook attributes
 else
   log("Platform #{node.platform} not supported!") { level :fatal }
   exit 1
+end
+
+case node.platform
+when 'centos'
+  directory node.gengine.config do
+    owner 'root'
+    group 'root'
+    mode 0755
+  end
 end
 
 case node.gengine.role

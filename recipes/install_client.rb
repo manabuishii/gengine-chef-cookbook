@@ -19,10 +19,16 @@
 
 case  node.platform
 when 'debian','ubuntu'
-  p = package 'gridengine-client' do
-    action :nothing
+  package 'gridengine-client'
+when 'centos'
+  package 'gridengine'
+  directory "/usr/share/gridengine/default/common" do
+    owner node.gengine.user
+    group node.gengine.group
+    recursive true
+    mode 0755
+    action :create
   end
-  p.run_action(:install)
 end
 
 # make sure to communicate with the correct master

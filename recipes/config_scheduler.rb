@@ -31,9 +31,18 @@ config.merge!(node.gengine.scheduler) unless node.gengine.scheduler.empty?
 config_file = "#{node.gengine.config}/scheduler"
 
 _command = "qconf -Msconf #{config_file}"
-execute _command do
-  command _command
-  action :nothing
+case node.platform
+when 'debian','ubuntu'
+  execute _command do
+    command _command
+    action :nothing
+  end
+when 'centos'
+  execute _command do
+    command _command
+    action :nothing
+    environment ({"SGE_ROOT" => "/usr/share/gridengine"})
+  end
 end
 
 # write the global defaults configuration file

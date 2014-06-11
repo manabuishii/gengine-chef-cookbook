@@ -31,9 +31,18 @@ config.merge!(node.gengine.complex_values) unless node.gengine.complex_values.em
 config_file = "#{node.gengine.config}/complex_values"
 
 _command = "qconf -Mc #{config_file}"
-execute _command do
-  command _command
-  action :nothing
+case node.platform
+when 'debian','ubuntu'
+  execute _command do
+    command _command
+    action :nothing
+  end
+when 'centos'
+  execute _command do
+    command _command
+    action :nothing
+    environment ({"SGE_ROOT" => "/usr/share/gridengine"})
+  end
 end
 
 file config_file do

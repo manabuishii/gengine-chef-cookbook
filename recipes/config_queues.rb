@@ -56,10 +56,19 @@ else
     mode = queues.include?(name) ? 'M' : 'A'
     # execute queue configuration command
     _command = "qconf -#{mode}q #{config_file}"
-    execute _command do
-      command _command
-      # wait until triggered further down
-      action :nothing
+    case node.platform
+    when 'debian','ubuntu'
+      execute _command do
+        command _command
+        # wait until triggered further down
+        action :nothing
+      end
+    when 'centos'
+      execute _command do
+        command _command
+        action :nothing
+        environment ({"SGE_ROOT" => "/usr/share/gridengine"})
+      end
     end
     # read the default queue configuration part of this recipe
     config = Gengine::Config::parse node.gengine.defaults.queues

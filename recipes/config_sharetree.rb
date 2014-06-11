@@ -35,9 +35,18 @@ repository_file = "#{node.gengine.repo.path}/sharetree"
 config_file = "#{node.gengine.config}/sharetree"
 # execute sharetree configuration
 _command = "qconf -Mstree #{config_file}"
-execute _command do
-  command _command
-  action :nothing
+case node.platform
+when 'debian','ubuntu'
+  execute _command do
+    command _command
+    action :nothing
+  end
+when 'centos'
+  execute _command do
+    command _command
+    action :nothing
+    environment ({"SGE_ROOT" => "/usr/share/gridengine"})
+  end
 end
 # use a very simple default sharetree unless 
 # overwritten by the configuration repository

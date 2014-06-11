@@ -22,11 +22,41 @@ include_recipe 'gengine::install_client'
 
 case  node.platform
 when 'debian','ubuntu'
-  p = package 'gridengine-exec' do
-    action :nothing
-  end
-  p.run_action(:install)
+  package 'gridengine-exec'
   service 'gridengine-exec' do
+    pattern "sge_execd"
+    stop_command "killall sge_execd"
+    action [ :enable, :start ]
+  end
+when 'centos'
+  package 'gridengine-execd'
+  file "/usr/share/gridengine/default/common/bootstrap" do
+    owner "sgeadmin"
+    group "sgeadmin"
+    mode "0644"
+    action :create
+    content <<-EOC
+admin_user             sgeadmin
+default_domain          none
+ignore_fqdn             true
+spooling_method         berkeleydb
+spooling_lib            libspoolb
+spooling_params         /var/spool/gridengine/default/spooldb
+binary_path             /usr/share/gridengine/bin
+qmaster_spool_dir       /var/spool/gridengine/default/qmaster
+security_mode           none
+    EOC
+  end
+  execute "inst_sge" do
+    command <<-EOC
+      chown sgeadmin:sgeadmin /usr/share/gridengine/default/common/*
+      cd /usr/share/gridengine
+      touch /usr/share/gridengine/default/common/settings.sh
+      sed -i 's/^EXEC_HOST_LIST=.*$/EXEC_HOST_LIST=\"1xrm01.devops.test\"/' ./my_configuration.conf
+      ./inst_sge -x -auto ./my_configuration.conf
+    EOC
+  end
+  service 'sge_execd' do
     pattern "sge_execd"
     stop_command "killall sge_execd"
     action [ :enable, :start ]
