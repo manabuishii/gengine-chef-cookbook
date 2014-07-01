@@ -52,7 +52,7 @@ security_mode           none
       chown sgeadmin:sgeadmin /usr/share/gridengine/default/common/*
       cd /usr/share/gridengine
       touch /usr/share/gridengine/default/common/settings.sh
-      sed -i 's/^EXEC_HOST_LIST=.*$/EXEC_HOST_LIST=\"1xrm01.devops.test\"/' ./my_configuration.conf
+      sed -i 's/^EXEC_HOST_LIST=.*$/EXEC_HOST_LIST=#{node['gengine']['master']}/' ./my_configuration.conf
       ./inst_sge -x -auto ./my_configuration.conf
     EOC
   end
