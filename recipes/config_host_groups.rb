@@ -29,13 +29,9 @@ else
   node.gengine.host_groups.each_pair do |name,attributes|
     # store the host group configuration file in the file-system
     host_group_file = "#{node.gengine.files.host_groups}/#{name}"
-    case  node.platform
-    when 'debian','ubuntu'
-      # TODO: run qconf -shgrpl
-      # run in modification mode if host group exists already
-      #mode = `qconf -shgrpl`.split.include?("@#{name}") ? 'M' : 'A'
-      mode = "A"
-    when 'centos'
+    if system('which qconf')
+      mode = `qconf -shgrpl`.split.include?("@#{name}") ? 'M' : 'A'
+    else
       mode = "A"
     end
     # run host group configuration command of GridEngine passing a file as source
@@ -139,17 +135,12 @@ else
     end
   end
   # make sure to remove execution nodes nod configured 
-  case  node.platform
-  when 'debian','ubuntu'
-    # TODO q	conf -sel
-    #`qconf -sel`.split.each do |node|
-    #  unless execution_nodes.include? node
-    #    `qconf -de #{node} > /dev/null`
-    #    Chef::Log.info("[gengine] Execution node #{node} removed from GridEngine")
-    #  end
-    #end
-    log "TODO not implement yet in debian ubuntu"
-  when 'centos'
-    log "not implement yet in centos"
+  if system('which qconf')
+    `qconf -sel`.split.each do |node|
+      unless execution_nodes.include? node
+        `qconf -de #{node} > /dev/null`
+        Chef::Log.info("[gengine] Execution node #{node} removed from GridEngine")
+      end
+    end
   end
 end
