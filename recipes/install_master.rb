@@ -34,6 +34,7 @@ when 'centos'
       cd /usr/share/gridengine
       ./inst_sge -m -auto ./my_configuration.conf
     EOC
+    not_if { ::File.exists?("/usr/share/gridengine/default")}
   end
   #service 'gridengine-master' do
   #  supports :restart => true, :'force-reload' => true

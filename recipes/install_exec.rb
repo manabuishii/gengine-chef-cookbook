@@ -55,6 +55,7 @@ security_mode           none
       sed -i 's/^EXEC_HOST_LIST=.*$/EXEC_HOST_LIST=#{node['gengine']['master']}/' ./my_configuration.conf
       ./inst_sge -x -auto ./my_configuration.conf
     EOC
+    not_if { ::File.exists?("/usr/share/gridengine/default")}
   end
   service 'sge_execd' do
     pattern "sge_execd"
