@@ -29,6 +29,23 @@ when 'centos'
     mode 0755
     action :create
   end
+  file "/usr/share/gridengine/default/common/bootstrap" do
+    owner "sgeadmin"
+    group "sgeadmin"
+    mode "0644"
+    action :create
+    content <<-EOC
+admin_user             sgeadmin
+default_domain          none
+ignore_fqdn             true
+spooling_method         berkeleydb
+spooling_lib            libspoolb
+spooling_params         /var/spool/gridengine/default/spooldb
+binary_path             /usr/share/gridengine/bin
+qmaster_spool_dir       /var/spool/gridengine/default/qmaster
+security_mode           none
+    EOC
+  end
 end
 
 # make sure to communicate with the correct master
