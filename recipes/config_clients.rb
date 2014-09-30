@@ -32,6 +32,15 @@ if node.gengine.clients.has_key? 'search'
   end
 end
 
+# service start when os is centos 
+case node.platform
+when 'centos'
+  service "sgemaster" do
+    action :start
+  end
+end
+
+
 # make sure that duplicates from all configuration sources get removed
 ngcn = Array.new
 node.gengine.clients.nodes.each do |name|
