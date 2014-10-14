@@ -82,4 +82,10 @@ when 'centos'
   include_recipe 'gengine::config_host_groups'
   include_recipe 'gengine::config_queues'
   include_recipe 'gengine::config_clients'
+  # sgemaster starts on boot
+  service 'sgemaster' do
+    pattern "sgemaster"
+    action [ :enable, :start ]
+  end
+
 end
