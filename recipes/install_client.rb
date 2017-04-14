@@ -17,14 +17,14 @@
 # limitations under the License.
 #
 
-case  node.platform
+case  node[:platform]
 when 'debian','ubuntu'
   package 'gridengine-client'
 when 'centos'
   package 'gridengine'
   directory "/usr/share/gridengine/default/common" do
-    owner node.gengine.user
-    group node.gengine.group
+    owner node[:gengine][:user]
+    group node[:gengine][:group]
     recursive true
     mode 0755
     action :create
@@ -49,10 +49,10 @@ security_mode           none
 end
 
 # make sure to communicate with the correct master
-file node.gengine.files.qmaster do
-  owner node.gengine.user
-  group node.gengine.group
+file node[:gengine][:files][:qmaster] do
+  owner node[:gengine][:user]
+  group node[:gengine][:group]
   mode 0644
-  content "#{node.gengine.master}\n"
+  content "#{node[:gengine][:master]}\n"
 end
 

@@ -1,0 +1,101 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_solo
+  chef_omnibus_install_options: ' -d /tmp/vagrant-cache/vagrant_omnibus'
+
+verifier:
+  name: shell
+  command: kitchen exec master1 -c "/tmp/result/qsubtest.sh"
+
+platforms:
+  - name: ubuntu-14.04
+    driver:
+      vagrantfile_erb: Vagrantfile.erb
+      synced_folders:
+        - ['./result', '/tmp/result']
+
+suites:
+  - name: master1
+    driver:
+      vm_hostname: "master1.devops.test"
+      network:
+        private_network:
+          ip: "192.168.33.10"
+    run_list:
+      - recipe[ubuntu-change-source-list]
+      - recipe[apt]
+      - recipe[localsetup]
+      - recipe[timezone_lwrp]
+      - recipe[gengine]
+    attributes:
+      localsetup:
+        hostname: "master1.devops.test"
+      tz: "Asia/Tokyo"
+      ubuntu:
+        mirror_site_url: "http://ftp.jaist.ac.jp/pub/Linux/ubuntu/"
+        version: "14.04"
+        need_deb_src: false
+        need_update: true
+      gengine:
+        role: "master"
+        host_groups:
+          default:
+            nodes:
+              - "master1.devops.test"
+              - "exec1.devops.test"
+              - "exec2.devops.test"
+        complex_values:
+          qname: "q          RESTRING    ==    YES          NO         NONE     0"
+        queues:
+          default:
+            hostlist: "@default"
+
+  - name: exec1
+    driver:
+      vm_hostname: "exec1.devops.test"
+      network:
+        private_network:
+          ip: "192.168.33.20"
+    run_list:
+      - recipe[ubuntu-change-source-list]
+      - recipe[apt]
+      - recipe[localsetup]
+      - recipe[timezone_lwrp]
+      - recipe[gengine]
+    attributes:
+      localsetup:
+        hostname: "exec1.devops.test"
+      tz: "Asia/Tokyo"
+      ubuntu:
+        mirror_site_url: "http://ftp.jaist.ac.jp/pub/Linux/ubuntu/"
+        version: "14.04"
+        need_deb_src: false
+        need_update: true
+      gengine:
+        master: "master1.devops.test"
+  - name: exec2
+    driver:
+      vm_hostname: "exec2.devops.test"
+      network:
+        private_network:
+          ip: "192.168.33.22"
+    run_list:
+      - recipe[ubuntu-change-source-list]
+      - recipe[apt]
+      - recipe[localsetup]
+      - recipe[timezone_lwrp]
+      - recipe[gengine]
+    attributes:
+      localsetup:
+        hostname: "exec2.devops.test"
+      tz: "Asia/Tokyo"
+      ubuntu:
+        mirror_site_url: "http://ftp.jaist.ac.jp/pub/Linux/ubuntu/"
+        version: "14.04"
+        need_deb_src: false
+        need_update: true
+      gengine:
+        master: "master1.devops.test"

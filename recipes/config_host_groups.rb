@@ -17,18 +17,18 @@
 # limitations under the License.
 #
 
-node.default[:gengine][:files][:host_groups] = "#{node.gengine.config}/host_groups"
+node.default[:gengine][:files][:host_groups] = "#{node[:gengine][:config]}/host_groups"
 
-if node.gengine.host_groups.empty?
+if node[:gengine][:host_groups].empty?
   Chef::Log.warn("[gengine] No host group(s) defined for GridEngine queue master!")
 else
-  directory node.gengine.files.host_groups
+  directory node[:gengine][:files][:host_groups]
   # collects a list go all execution nodes from all host groups
   execution_nodes = Array.new
   # iterate over all defined host groups
-  node.gengine.host_groups.each_pair do |name,attributes|
+  node[:gengine][:host_groups].each_pair do |name,attributes|
     # store the host group configuration file in the file-system
-    host_group_file = "#{node.gengine.files.host_groups}/#{name}"
+    host_group_file = "#{node[:gengine][:files][:host_groups]}/#{name}"
     if system('which qconf')
       mode = `qconf -shgrpl`.split.include?("@#{name}") ? 'M' : 'A'
     else
@@ -36,7 +36,7 @@ else
     end
     # run host group configuration command of GridEngine passing a file as source
     _command = "qconf -#{mode}hgrp #{host_group_file}"
-    case node.platform
+    case node[:platform]
     when 'debian','ubuntu'
       execute _command do
         command _command
@@ -68,8 +68,8 @@ else
       end
     end
     # if configuration repository exists?
-    unless node.gengine.repo.url.empty?
-      repo_file = "#{node.gengine.repo.path}/host_groups/#{name}"
+    unless node[:gengine][:repo][:url].empty?
+      repo_file = "#{node[:gengine][:repo][:path]}/host_groups/#{name}"
       if ::File.exists? repo_file
         nodes = File.readlines(repo_file)[1].split
         host_group = host_group + nodes[1..-1]
@@ -103,7 +103,7 @@ else
       # are there resource attributes definitions for this host group?
       if attributes.has_key? 'resources'
         # store the resource attributes  configuration file in the file-system
-        host_group_resources_file = "#{node.gengine.files.host_groups}/#{name}_resources"
+        host_group_resources_file = "#{node[:gengine][:files][:host_groups]}/#{name}_resources"
         # list of all resources for this host group
         resources = Array.new
         attributes[:resources].each_pair do |key,value|

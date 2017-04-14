@@ -21,13 +21,13 @@ class Chef::Recipe
 end
 
 # find all quota definitions in configuration repository
-repo_path = "#{node.gengine.repo.path}/quotas"
+repo_path = "#{node[:gengine][:repo][:path]}/quotas"
 begin
   ::Dir.glob("#{repo_path}/*").each do |file|
     # quota name similar to file name!
     name = file.split('/')[-1]
     # don't overwrite already defined quotas
-    if node.gengine.quotas.has_key? name
+    if node[:gengine][:quotas].has_key? name
       Chef::Log.warn("[gengine] Ignoring quota defintion '#{name}' from repository!")
       next
     end
@@ -49,10 +49,10 @@ begin
   end
 end
 
-config_file = "#{node.gengine.config}/quotas"
+config_file = "#{node[:gengine][:config]}/quotas"
 
 _command = "qconf -Mrqs #{config_file}"
-case node.platform
+case node[:platform]
 when 'debian','ubuntu'
   execute _command do
     command _command
@@ -69,7 +69,7 @@ end
 quotas = String.new
 
 # iterate over all quot definitons
-node.gengine.quotas.each_pair do |name,attributes|
+node[:gengine][:quotas].each_pair do |name,attributes|
 
   unless attributes.has_key? 'description'
     Chef::Log.warn("[gengine] Quota #{name} has no description!")

@@ -21,12 +21,12 @@ class Chef::Recipe
   include Gengine
 end
 
-repo_path = "#{node.gengine.repo.path}/projects"
+repo_path = "#{node[:gengine][:repo][:path]}/projects"
 
 begin
   ::Dir.glob("#{repo_path}/*").each do |project|
     project = project.split('/')[-1]
-    next if node.gengine.projects.has_key? project
+    next if node[:gengine][:projects].has_key? project
     node.default[:gengine][:projects][project] = Hash.new
   end
 rescue
@@ -35,14 +35,14 @@ end
 
 projects = Gengine::Config::list('qconf -sprjl')
 
-unless node.gengine.projects.empty?
-  node.default[:gengine][:files][:projects] = "#{node.gengine.config}/projects"
-  directory node.gengine.files.projects
+unless node[:gengine][:projects].empty?
+  node.default[:gengine][:files][:projects] = "#{node[:gengine][:config]}/projects"
+  directory node[:gengine][:files][:projects]
 end
 
-node.gengine.projects.each_pair do |name,attributes|
+node[:gengine][:projects].each_pair do |name,attributes|
   
-  config_file = "#{node.gengine.files.projects}/#{name}"
+  config_file = "#{node[:gengine][:files][:projects]}/#{name}"
 
   mode = projects.include?(name) ? 'M' : 'A'
   _command = "qconf -#{mode}prj #{config_file}"
@@ -51,7 +51,7 @@ node.gengine.projects.each_pair do |name,attributes|
     action :nothing
   end
 
-  config = Gengine::Config.parse node.gengine.defaults.projects
+  config = Gengine::Config.parse node[:gengine][:defaults][:projects]
   config.merge! attributes
   config['name'] = name
 

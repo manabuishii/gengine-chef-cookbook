@@ -21,9 +21,9 @@ class Chef::Recipe
 end
 
 begin
-  ::Dir.glob("#{node.gengine.repo.path}/users/*").each do |user|
+  ::Dir.glob("#{node[:gengine][:repo][:path]}/users/*").each do |user|
     user = user.split('/')[-1]
-    next if node.gengine.users.has_key? user
+    next if node[:gengine][:users].has_key? user
     node.default[:gengine][:users][user] = Hash.new
   end
 rescue
@@ -32,14 +32,14 @@ end
 # list of users already configured
 users = Gengine::Config::list('qconf -suserl')
 
-unless node.gengine.users.empty?
-  node.default[:gengine][:files][:users] = "#{node.gengine.config}/users"
-  directory node.gengine.files.users
+unless node[:gengine][:users].empty?
+  node.default[:gengine][:files][:users] = "#{node[:gengine][:config]}/users"
+  directory node[:gengine][:files][:users]
 end
 
-node.gengine.users.each_pair do |name,attributes|
+node[:gengine][:users].each_pair do |name,attributes|
 
-  config_file = "#{node.gengine.files.users}/#{name}" 
+  config_file = "#{node[:gengine][:files][:users]}/#{name}" 
 
   mode = users.include?(name) ? 'M' : 'A'
   _command = "qconf -#{mode}user #{config_file} > /dev/null"
@@ -48,8 +48,8 @@ node.gengine.users.each_pair do |name,attributes|
     action :nothing
   end
   
-  config = Gengine::Config::parse(node.gengine.defaults.user)
-  config.merge!(Gengine::Config::read("#{node.gengine.repo.path}/users/#{name}"))
+  config = Gengine::Config::parse(node[:gengine][:defaults][:user])
+  config.merge!(Gengine::Config::read("#{node[:gengine][:repo][:path]}/users/#{name}"))
   config.merge!(attributes) unless attributes.empty?
   config['name'] = name
   

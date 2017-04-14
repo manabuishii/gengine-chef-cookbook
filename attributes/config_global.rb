@@ -4,7 +4,7 @@ default[:gengine][:global] = Hash.new
 # default global Grid Engine configuration
 default[:gengine][:defaults][:global] = <<-EOF
 #global:
-execd_spool_dir              #{node.gengine.files.exec_spool_dir}
+execd_spool_dir              #{node[:gengine][:files][:exec_spool_dir]}
 mailer                       /usr/bin/mail
 xterm                        /usr/bin/xterm
 prolog                       none

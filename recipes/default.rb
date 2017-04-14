@@ -17,15 +17,15 @@
 # limitations under the License.
 #
 
-case node.platform
+case node[:platform]
 when 'debian','ubuntu','centos'
   # defaults are set with cookbook attributes
 else
-  log("Platform #{node.platform} not supported!") { level :fatal }
+  log("Platform #{node[:platform]} not supported!") { level :fatal }
   exit 1
 end
 
-case node.platform
+case node[:platform]
 when 'centos'
   # add the EPEL repo
   yum_repository 'epel' do
@@ -34,14 +34,14 @@ when 'centos'
     gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
     action :create
   end
-  directory node.gengine.config do
+  directory node[:gengine][:config] do
     owner 'root'
     group 'root'
     mode 0755
   end
 end
 
-case node.gengine.role
+case node[:gengine][:role]
 when 'master'
   include_recipe 'gengine::install_master'
 when 'exec'
@@ -49,5 +49,5 @@ when 'exec'
 when 'client'
   include_recipe 'gengine::install_client'
 else
-  log("The role #{node.gengine.role} is not supported in GridEngine clusters!") { level :fatal }
+  log("The role #{node[:gengine][:role]} is not supported in GridEngine clusters!") { level :fatal }
 end

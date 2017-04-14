@@ -20,7 +20,7 @@
 # all execution nodes are clients also!
 include_recipe 'gengine::install_client'
 
-case  node.platform
+case  node[:platform]
 when 'debian','ubuntu'
   package 'gridengine-exec'
   service 'gridengine-exec' do

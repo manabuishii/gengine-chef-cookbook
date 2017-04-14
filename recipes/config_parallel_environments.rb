@@ -24,10 +24,10 @@ end
 
 # if parallel environment configuration exist in repository
 begin
-  ::Dir.glob("#{node.gengine.repo.path}/parallel_environments/*").each do |parallel_env|
+  ::Dir.glob("#{node[:gengine][:repo][:path]}/parallel_environments/*").each do |parallel_env|
     # file name matches parallel environment name!!
     parallel_env = parallel_env.split('/')[-1]
-    next if node.gengine.parallel_environments.has_key? parallel_env
+    next if node[:gengine][:parallel_environments].has_key? parallel_env
     # add to configuration list if not existing yet
     node.default[:gengine][:parallel_environments][parallel_env] = Hash.new
     Chef::Log.debug("[gengine] Parallel environment '#{parallel_env}' added from configuration repository")
@@ -35,18 +35,18 @@ begin
 rescue
 end
 
-unless node.gengine.parallel_environments.empty?
+unless node[:gengine][:parallel_environments].empty?
 
   # directory storing configurations for parallel environments
-  node.default[:gengine][:files][:parallel_environments] = "#{node.gengine.config}/parallel_environments"
-  directory node.gengine.files.parallel_environments
+  node.default[:gengine][:files][:parallel_environments] = "#{node[:gengine][:config]}/parallel_environments"
+  directory node[:gengine][:files][:parallel_environments]
   # list of existing parallel environments
   parallel_environments = `qconf -spl 2> /dev/null`
   parallel_environments = parallel_environments.empty? ? Array.new : parallel_environments.split
   # iterate over all defined parallel environments
-  node.gengine.parallel_environments.each_pair do |name,attribtues|
+  node[:gengine][:parallel_environments].each_pair do |name,attribtues|
     # where to store (the potentially updated) parallel environment configuration
-    config_file = "#{node.gengine.files.parallel_environments}/#{name}"
+    config_file = "#{node[:gengine][:files][:parallel_environments]}/#{name}"
     # if parallel environment exits run in modification mode
     mode = parallel_environments.include?(name) ? 'M' : 'A'
     # execute parallel environment configuration
@@ -57,9 +57,9 @@ unless node.gengine.parallel_environments.empty?
       action :nothing
     end
     # read the default configuration for parallel environments part of this recipe
-    config = Gengine::Config::parse node.gengine.defaults.parallel_environment
+    config = Gengine::Config::parse node[:gengine][:defaults][:parallel_environment]
     # merge configuration from the repository (overwrites defaults)
-    config.merge!(Gengine::Config::read("#{node.gengine.repo.path}/parallel_environments/#{name}"))
+    config.merge!(Gengine::Config::read("#{node[:gengine][:repo][:path]}/parallel_environments/#{name}"))
     # merge configuration from attributes (overwrites repository configuration)
     config.merge!(attribtues) unless attribtues.empty?
     # set the parallel environment name

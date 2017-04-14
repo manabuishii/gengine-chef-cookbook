@@ -1,0 +1,7 @@
+.vagrant
+Berksfile.lock
+cookbooks/
+result/*.log
+.kitchen
+
+.DS_Store

@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-case  node.platform
+case  node[:platform]
 when 'debian','ubuntu'
   package 'git-core'
   package 'gridengine-master'
@@ -42,13 +42,13 @@ when 'centos'
 end
 
 # tell recipe "install_client" that the master is local
-node.default[:gengine][:master] = node.fqdn
+node.default[:gengine][:master] = node[:fqdn]
 # install and configure the client on the master
 include_recipe "gengine::install_client"
-node.default[:gengine][:clients][:nodes] << node.fqdn
+node.default[:gengine][:clients][:nodes] << node[:fqdn]
 # queue master configuration from an external Git repository
-include_recipe 'gengine::config_repository' unless node.gengine.repo.url.empty?
-case  node.platform
+include_recipe 'gengine::config_repository' unless node[:gengine][:repo][:url].empty?
+case  node[:platform]
 when 'debian','ubuntu'
 # Several runs will be needed to configuration the master!
 #if ::File.exists? node.gengine.config

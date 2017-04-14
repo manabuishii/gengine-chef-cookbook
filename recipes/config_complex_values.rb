@@ -22,16 +22,16 @@ class Chef::Recipe
 end
 
 # parse default configuration from above
-config = Gengine::Config::parse node.gengine.defaults.complex_values
+config = Gengine::Config::parse node[:gengine][:defaults][:complex_values]
 # merge configuration from the repository (overwrites defaults)
-config.merge!(Gengine::Config::read("#{node.gengine.repo.path}/complex_values"))
+config.merge!(Gengine::Config::read("#{node[:gengine][:repo][:path]}/complex_values"))
 # merge configuration from the repository (overwrites defaults)
-config.merge!(node.gengine.complex_values) unless node.gengine.complex_values.empty?
+config.merge!(node[:gengine][:complex_values]) unless node[:gengine][:complex_values].empty?
 
-config_file = "#{node.gengine.config}/complex_values"
+config_file = "#{node[:gengine][:config]}/complex_values"
 
 _command = "qconf -Mc #{config_file}"
-case node.platform
+case node[:platform]
 when 'debian','ubuntu'
   execute _command do
     command _command

@@ -22,16 +22,16 @@ class Chef::Recipe
 end
 
 # parse default configuration from above
-config = Gengine::Config::parse node.gengine.defaults.global
+config = Gengine::Config::parse node[:gengine][:defaults][:global]
 # merge configuration from repository (overwrites defaults)
-config.merge!(Gengine::Config::read("#{node.gengine.repo.path}/global"))
+config.merge!(Gengine::Config::read("#{node[:gengine][:repo][:path]}/global"))
 # merge configuration attributes (overwrite repository configuration)
-config.merge!(node.gengine.global) unless node.gengine.global.empty?
+config.merge!(node[:gengine][:global]) unless node[:gengine][:global].empty?
 
-config_file = "#{node.gengine.config}/global"
+config_file = "#{node[:gengine][:config]}/global"
 
 _command = "qconf -Mconf #{config_file}"
-case  node.platform
+case  node[:platform]
 when 'debian','ubuntu'
   execute _command do
     command _command

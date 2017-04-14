@@ -22,16 +22,16 @@ class Chef::Recipe
 end
 
 # parse default configuration from above
-config = Gengine::Config::parse node.gengine.defaults.scheduler
+config = Gengine::Config::parse node[:gengine][:defaults][:scheduler]
 # merge configuration from repository (overwrites defaults)
-config.merge!(Gengine::Config::read("#{node.gengine.repo.path}/scheduler"))
+config.merge!(Gengine::Config::read("#{node[:gengine][:repo][:path]}/scheduler"))
 # merge configuration attributes (overwrite repository configuration)
-config.merge!(node.gengine.scheduler) unless node.gengine.scheduler.empty?
+config.merge!(node[:gengine][:scheduler]) unless node[:gengine][:scheduler].empty?
 
-config_file = "#{node.gengine.config}/scheduler"
+config_file = "#{node[:gengine][:config]}/scheduler"
 
 _command = "qconf -Msconf #{config_file}"
-case node.platform
+case node[:platform]
 when 'debian','ubuntu'
   execute _command do
     command _command

@@ -30,12 +30,12 @@ shares=1
 childnodes=NONE
 EOF
 
-repository_file = "#{node.gengine.repo.path}/sharetree"
+repository_file = "#{node[:gengine][:repo][:path]}/sharetree"
 # where to store the active sharetree configuration
-config_file = "#{node.gengine.config}/sharetree"
+config_file = "#{node[:gengine][:config]}/sharetree"
 # execute sharetree configuration
 _command = "qconf -Mstree #{config_file}"
-case node.platform
+case node[:platform]
 when 'debian','ubuntu'
   execute _command do
     command _command
